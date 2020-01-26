@@ -50,8 +50,8 @@ class FastaAna:
                 pos.append(x)
                 count += 1
                 x += 2
-        print("total " + str(count)+ " START found:")
-        print(pos)
+        #print("total " + str(count)+ " START found:")
+        #print(pos)
         return pos
 
     def findSTOP(self, start, end):
@@ -68,7 +68,7 @@ class FastaAna:
             stop = False
             if(seq[x] == 'T'):
                 if(seq[x+1] == 'A'):
-                    if(seq[x+2] == 'G' or seq[x+1] == 'G'):
+                    if(seq[x+2] == 'G' or seq[x+2] == 'A'):
                         stop = True
                 if(seq[x+1] == 'G'):
                     if(seq[x+2] == 'A'):
@@ -77,25 +77,34 @@ class FastaAna:
                 pos.append(x)
                 count += 1
                 x += 2
-        print("total " + str(count)+ " STOP found:")
-        print(pos)
+        #print("total " + str(count)+ " STOP found:")
+        #print(pos)
         return pos
 
-    def findORF(self):
+    def findORF(self, frame):
         #not fix: need to add frame
-        pStart = self.findSTART(0,-1)
-        pStop = self.findSTOP(0,-1)
+        pStart = []
+        pStop = []
+        for x in self.findSTART(0,-1):
+            if(x%3 == frame-1):
+                pStart.append(x)
+        for x in self.findSTOP(0,-1):
+            if(x%3 == frame-1):
+                pStop.append(x)
+        #print(pStart)
+        #print(pStop)
         hold, count = 0, 0
         ORF = []
         for x in pStart:
-            for y in range(hold, len(pStop)-1):
-                if(x < pStop[y]):
-                    ORF.append((x,pStop[y]))
-                    hold = y
-                    count += 1
-                    break
+            if(x > pStop[hold]):
+                for y in range(hold, len(pStop)-1):
+                    if(x < pStop[y]):
+                        ORF.append((x,pStop[y]))
+                        hold = y
+                        count += 1
+                        break
 
-        print("Total "+str(count)+" ORF found:")
+        print("Total "+str(count)+" ORF found in reading frame " + str(frame) + ":")
         print(ORF)
         return ORF
 
@@ -105,11 +114,6 @@ class FastaAna:
 
 
 
-
-
-
-
 file = r"/Users/GuotaiShen/Desktop/Bioinformatic/2019-nCoV/sequence.fasta"
 CoV = FastaAna(file)
-CoV.findORF()
-
+CoV.findORF(2)
