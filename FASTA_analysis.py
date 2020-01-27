@@ -7,6 +7,7 @@ class FastaAna:
     def __init__(self, filename):
         self.filename = filename
         self.seq = self.openFASTA(filename)
+        self.revS = self.revSeq(self.seq)
         self.length = len(self.seq)
 
     def openFASTA(self, filename):
@@ -36,9 +37,11 @@ class FastaAna:
         stat = "total nt: "+str(count)+"\n A: "+str(A)+"\n T: "+str(T)+"\n C: "+str(C)+"\n G: "+str(G)
         print(stat)
 
-    def findSTART(self, start, end):
+    def findSTART(self, start, end, rev = False):
         # find all start codons and return position
         seq = self.seq
+        if (rev):
+            seq = self.revS
         count = 0
         pos = []
         #r = input("enter the range of search (if thorough enter 0,-1):")
@@ -55,9 +58,11 @@ class FastaAna:
         #print(pos)
         return pos
 
-    def findSTOP(self, start, end):
+    def findSTOP(self, start, end, rev = False):
         #find all stop codons and return position
         seq = self.seq
+        if(rev):
+            seq = self.revS
         count = 0
         pos = []
         #r = input("enter the range of search (if thorough enter 0,-1):")
@@ -109,19 +114,39 @@ class FastaAna:
         print(ORF)
         return ORF
 
-    def plotORF(self, *ORF):
+    def plotORF(self,hold, *ORF):
+        if(not ORF):
+            ORF = [self.findORF(1)]
         x1 = np.arange(self.length)
         y1 = x1
         for orf in ORF:
             x,y = [],[]
             for w in orf:
-                x.append(w[0])
-                y.append(w[1])
-                plt.plot([w[0],w[0]], [w[0],w[1]])
+                if(w[1]-w[0] > hold):
+                    x.append(w[0])
+                    y.append(w[1])
+                    plt.plot([w[0],w[0]], [w[0],w[1]])
             plt.plot(x,y,'.',x1,y1,'--')
         plt.show()
 
+    def revSeq(self, seq):
+        #reverse seq and return in a 5' to 3' order
+        rev = ""
+        for x in seq:
+            if(x == 'A'):
+                rev += 'T'
+            elif(x == 'T'):
+                rev += 'A'
+            elif(x == 'C'):
+                rev += 'G'
+            else:
+                rev += 'C'
+        ans = rev[::-1]
+        return ans
 
+
+    def getSeq(self, start, end):
+        return self.seq[start:end]
 
 
 
@@ -131,7 +156,7 @@ class FastaAna:
 covFile = r"/Users/GuotaiShen/Desktop/Bioinformatic/2019-nCoV/sequence.fasta"
 file1 =  r"/Users/GuotaiShen/Desktop/Bioinformatic/pNMT1-GNAS/Pnmt1-GNAS.txt"
 CoV = FastaAna(covFile)
-orf1 = CoV.findORF(1)
-orf2 = CoV.findORF(2)
-orf3 = CoV.findORF(3)
-CoV.plotORF(orf1, orf2, orf3)
+#orf1 = CoV.findORF(1)
+#orf2 = CoV.findORF(2)
+#orf3 = CoV.findORF(3)
+#CoV.plotORF(300, orf1, orf2, orf3)
