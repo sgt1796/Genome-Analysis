@@ -1,6 +1,7 @@
 import scipy as sp
 import numpy as np
 import sys
+from matplotlib import pyplot as plt
 
 class FastaAna:
     def __init__(self, filename):
@@ -81,15 +82,15 @@ class FastaAna:
         #print(pos)
         return pos
 
-    def findORF(self, frame):
+    def findORF(self, fr):
         #not fix: need to add frame
         pStart = []
         pStop = []
         for x in self.findSTART(0,-1):
-            if(x%3 == frame-1):
+            if(x%3 == fr-1):
                 pStart.append(x)
         for x in self.findSTOP(0,-1):
-            if(x%3 == frame-1):
+            if(x%3 == fr-1):
                 pStop.append(x)
         #print(pStart)
         #print(pStop)
@@ -104,16 +105,33 @@ class FastaAna:
                         count += 1
                         break
 
-        print("Total "+str(count)+" ORF found in reading frame " + str(frame) + ":")
+        print("Total "+str(count)+" ORF found in reading frame " + str(fr) + ":")
         print(ORF)
         return ORF
 
+    def plotORF(self, *ORF):
+        x1 = np.arange(self.length)
+        y1 = x1
+        for orf in ORF:
+            x,y = [],[]
+            for w in orf:
+                x.append(w[0])
+                y.append(w[1])
+                plt.plot([w[0],w[0]], [w[0],w[1]])
+            plt.plot(x,y,'.',x1,y1,'--')
+        plt.show()
 
 
 
 
 
 
-file = r"/Users/GuotaiShen/Desktop/Bioinformatic/2019-nCoV/sequence.fasta"
-CoV = FastaAna(file)
-CoV.findORF(2)
+
+
+covFile = r"/Users/GuotaiShen/Desktop/Bioinformatic/2019-nCoV/sequence.fasta"
+file1 =  r"/Users/GuotaiShen/Desktop/Bioinformatic/pNMT1-GNAS/Pnmt1-GNAS.txt"
+CoV = FastaAna(covFile)
+orf1 = CoV.findORF(1)
+orf2 = CoV.findORF(2)
+orf3 = CoV.findORF(3)
+CoV.plotORF(orf1, orf2, orf3)
