@@ -87,14 +87,14 @@ class FastaAna:
         #print(pos)
         return pos
 
-    def findORF(self, fr):
+    def findORF(self, fr, rev = False):
         #not fix: need to add frame
         pStart = []
         pStop = []
-        for x in self.findSTART(0,-1):
+        for x in self.findSTART(0,-1,rev):
             if(x%3 == fr-1):
                 pStart.append(x)
-        for x in self.findSTOP(0,-1):
+        for x in self.findSTOP(0,-1,rev):
             if(x%3 == fr-1):
                 pStop.append(x)
         #print(pStart)
@@ -156,7 +156,7 @@ class FastaAna:
 covFile = r"/Users/GuotaiShen/Desktop/Bioinformatic/2019-nCoV/sequence.fasta"
 file1 =  r"/Users/GuotaiShen/Desktop/Bioinformatic/pNMT1-GNAS/Pnmt1-GNAS.txt"
 CoV = FastaAna(covFile)
-#orf1 = CoV.findORF(1)
+orf1 = CoV.findORF(1,rev=True)
 #orf2 = CoV.findORF(2)
 #orf3 = CoV.findORF(3)
 #CoV.plotORF(300, orf1, orf2, orf3)
